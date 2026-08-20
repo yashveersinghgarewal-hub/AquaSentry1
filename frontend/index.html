@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AquaSentry — Water Safety Monitor</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 32 32" fill="none">
+          <circle cx="16" cy="16" r="14" stroke="#4d8dff" stroke-width="1.4" opacity="0.4"/>
+          <circle cx="16" cy="16" r="9" stroke="#4d8dff" stroke-width="1.4" opacity="0.7"/>
+          <circle cx="16" cy="16" r="4" fill="#4d8dff"/>
+        </svg>
+      </div>
+      <div>
+        <span class="brand-name">AquaSentry</span>
+        <span class="station-tag">/ AQUA-001</span>
+      </div>
+    </div>
+    <div class="live-pill" id="connectionStatus">
+      <span class="live-dot"></span>
+      MINIBOT ONLINE
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">Tank Status — Kitchen Storage Line</div>
+
+    <div class="ring-stage">
+      <div class="ring r1"></div>
+      <div class="ring r2"></div>
+      <div class="ring r3"></div>
+      <div class="core">
+        <div class="core-label">ARSENIC</div>
+        <div class="core-value">0.018</div>
+        <div class="core-unit">mg/L</div>
+      </div>
+    </div>
+
+    <h1 class="status-title">Contamination <span class="hl">detected</span></h1>
+    <p class="status-sub">
+      Arsenic levels are above the safe drinking threshold. This water is unsafe to drink or cook with.
+      It is still fine for cleaning or watering non-edible plants.
+    </p>
+  </section>
+
+  <section class="panel simulator-panel" aria-labelledby="simulatorTitle">
+    <div class="panel-head">
+      <div>
+        <span class="panel-title" id="simulatorTitle">MAS-G1 device simulator</span>
+        <p class="panel-intro">Test safe, warning, and spike readings before connecting the Arduino.</p>
+      </div>
+      <span class="panel-meta" id="simulatorClock">READY</span>
+    </div>
+    <div class="simulator-screen">
+      <div class="simulator-status"><span class="simulator-dot"></span><span id="simulatorStatus">SMART CHIP LOADED</span><span id="simulatorTime">--:--</span></div>
+      <div class="simulator-tabs" id="simulatorTabs" role="tablist" aria-label="Analyte selection">
+        <button class="simulator-tab active" type="button" data-analyte="As">As</button>
+        <button class="simulator-tab" type="button" data-analyte="Cu">Cu</button>
+        <button class="simulator-tab" type="button" data-analyte="Pb">Pb</button>
+        <button class="simulator-tab" type="button" data-analyte="Ni">Ni</button>
+        <button class="simulator-tab" type="button" data-analyte="Cr">Cr</button>
+        <button class="simulator-tab" type="button" data-analyte="Zn">Zn</button>
+      </div>
+      <div class="simulator-analyte" id="simulatorAnalyte">ARSENIC (III) · STRIP AS-M003050</div>
+      <div class="simulator-readout"><strong id="simulatorValue">--.---</strong><span id="simulatorUnit">mg/L</span></div>
+      <div class="simulator-flag idle" id="simulatorFlag"><span></span><b id="simulatorFlagText">READY · IMPORT OR RUN DEMO</b></div>
+      <div class="simulator-graph"><div class="simulator-graph-label"><span>VOLTAMMOGRAM</span><span id="simulatorScanState">IDLE</span></div><svg viewBox="0 0 520 120" preserveAspectRatio="none" aria-label="MAS-G1 voltammogram" id="simulatorTraceSvg"></svg></div>
+      <div class="simulator-metrics"><div>PEAK V<strong id="simulatorPeakV">--</strong></div><div>NET I (µA)<strong id="simulatorNetI">--</strong></div><div>CAL R²<strong id="simulatorR2">0.9967</strong></div></div>
+      <div class="simulator-actions"><button class="btn" id="runSimulation" type="button">Run demo</button><button class="btn ghost" id="importScan" type="button">Import scan</button></div>
+      <div class="simulator-actions simulator-actions-secondary"><button class="btn ghost" id="importCalibration" type="button">Import calibration</button><button class="btn ghost" id="exportHistory" type="button">Export CSV</button></div>
+      <input type="file" id="scanFileInput" accept=".csv" multiple hidden>
+      <input type="file" id="calibrationFileInput" accept=".json" hidden>
+      <p class="simulator-note" id="simulatorNote" aria-live="polite"></p>
+      <div class="simulator-history"><div class="simulator-history-title">LAST RESULTS · STORED <span id="simulatorHistoryCount">0</span>/100</div><div id="simulatorHistoryList"></div></div>
+    </div>
+  </section>
+
+  <!-- Reading detail -->
+  <div class="panel">
+    <div class="panel-head">
+      <span class="panel-title">Reading detail</span>
+      <span class="panel-meta" id="detectedMeta">DETECTED 07:42 · TODAY</span>
+    </div>
+    <div class="reading-grid">
+      <div class="reading-cell">
+        <div class="k" id="contaminantName">Arsenic (As)</div>
+        <div class="v danger" id="readingValue">0.018 mg/L</div>
+        <div class="thresh" id="safeLimit">safe limit: 0.010 mg/L</div>
+      </div>
+      <div class="reading-cell">
+        <div class="k">Confidence</div>
+        <div class="v" id="confidenceValue">94%</div>
+        <div class="thresh" id="confirmationValue">verified across 2 nearby homes</div>
+      </div>
+      <div class="reading-cell">
+        <div class="k">Likely source</div>
+        <div class="v source-value">Groundwater</div>
+        <div class="thresh" id="sourceNote">naturally occurring, not tank-local</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- What to do right now -->
+  <div class="panel">
+    <div class="panel-head">
+      <span class="panel-title">What to do right now</span>
+    </div>
+    <ul class="steps">
+      <li class="step">
+        <span class="step-num">1</span>
+        <div class="step-body">
+          <div class="t">Stop drinking or cooking with this water</div>
+          <div class="d">Switch to bottled or a known-safe source until a follow-up reading confirms it's clear.</div>
+        </div>
+      </li>
+      <li class="step">
+        <span class="step-num">2</span>
+        <div class="step-body">
+          <div class="t">Boiling will not help</div>
+          <div class="d">Boiling does not remove arsenic, and can concentrate it further as water evaporates.</div>
+        </div>
+      </li>
+      <li class="step">
+        <span class="step-num">3</span>
+        <div class="step-body">
+          <div class="t">Other household uses are still fine</div>
+          <div class="d">Cleaning, laundry, and watering non-edible plants remain safe with this water.</div>
+        </div>
+      </li>
+      <li class="step">
+        <span class="step-num">4</span>
+        <div class="step-body">
+          <div class="t">A report has been prepared below</div>
+          <div class="d">Because nearby homes show the same reading, this looks like a source-level issue worth reporting.</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Remediation -->
+  <div class="panel">
+    <div class="panel-head">
+      <span class="panel-title">Treatment options for arsenic</span>
+    </div>
+    <div class="remedy-grid">
+      <div class="remedy-card">
+        <span class="tag">Recommended</span>
+        <h4>Activated alumina / iron-oxide filter</h4>
+        <p>Purpose-built adsorption filters remove arsenic specifically, unlike standard carbon filters. Fits under most sinks.</p>
+      </div>
+      <div class="remedy-card">
+        <span class="tag">Higher cost</span>
+        <h4>Reverse osmosis system</h4>
+        <p>Highly effective against arsenic and most other dissolved contaminants, at a higher upfront and maintenance cost.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Authority contact -->
+  <div class="panel">
+    <div class="panel-head">
+      <span class="panel-title">Report to your local authority</span>
+      <span class="panel-meta">3 HOMES CONFIRMED</span>
+    </div>
+
+    <div class="authority-card">
+      <div class="authority-info">
+        <div class="name">Local Water &amp; Environmental Authority</div>
+        <div class="desc">Handles groundwater contamination reports</div>
+      </div>
+      <button class="btn" onclick="alert('This would open your authority contact flow — plug in the real number/portal for your area.')">Contact now</button>
+    </div>
+
+    <div class="authority-card">
+      <div class="authority-info">
+        <div class="name">Public Health Department</div>
+        <div class="desc">For drinking water safety concerns</div>
+      </div>
+      <button class="btn ghost" onclick="alert('This would open a call or email flow to the public health department.')">View contact</button>
+    </div>
+
+    <div class="report-box" id="reportBox">
+<span class="lbl">STATION</span>    <span class="val">HOME-0142</span>
+<span class="lbl">CONTAMINANT</span> <span class="val">Arsenic (As)</span>
+<span class="lbl">READING</span>    <span class="val">0.018 mg/L</span> <span class="lbl">(limit 0.010 mg/L)</span>
+<span class="lbl">DETECTED</span>   <span class="val">Today, 07:42</span>
+<span class="lbl">CONFIRMED BY</span> <span class="val">3 nearby stations</span>
+<span class="lbl">STATUS</span>     <span class="val">Ready to send</span>
+    </div>
+  </div>
+
+  <!-- Bot explanation workspace -->
+  <div class="panel bot-panel">
+    <div class="panel-head">
+      <div>
+        <span class="panel-title">Bot explanation</span>
+        <p class="panel-intro">Add the short description AquaSentry should use when someone asks what it does.</p>
+      </div>
+      <span class="panel-meta">CONTENT TO COMPLETE</span>
+    </div>
+    <label class="bot-label" for="botBrief">YOUR BOT TEXT</label>
+    <textarea id="botBrief" class="bot-editor" spellcheck="true">AquaSentry
+  Solar-assisted water robot for arsenic screening | Project summary
+
+  What it is
+  A small catamaran-style surface robot, roughly 1 m long and 8 to 20 kg, that drives itself across a lake, creek or reservoir. At each waypoint it stops, pulls water into a sealed internal chamber, screens it for arsenic, and tags the reading with GPS. A solar panel on the deck stretches the mission; the battery handles motor loads and cloudy stretches.
+
+  The important design choice is that the sensor never touches open water. Raw seawater fouls electrodes and throws off electrochemical readings because of chloride, sulfate and suspended solids. Instead the robot brings a filtered, temperature-controlled sample to the sensor. Same cell geometry every time, so results are repeatable.
+
+  Scope, stated honestly. This is a screening tool, not a certified lab instrument. It tells you which samples are worth sending to a lab. It does not replace one.
+
+  How it helps
+  Arsenic has no colour, smell or taste. The WHO provisional guideline is 10 µg/L. You cannot find it without an instrument, and the instruments that reach that limit (ICP-MS, graphite furnace AAS) cost orders of magnitude more than this robot and never leave the building. Field colorimetric kits travel well but read too coarsely near the threshold.
+
+  So the gap is not sensitivity. It is mobility. Today, mapping a water body means a person collecting bottles by hand, carrying them to a lab, and waiting. That is slow, expensive, and produces a handful of points instead of a map.
+
+  AquaSentry closes that gap three ways:
+  AquaSentry closes that gap three ways:
+  AquaSentry closes that gap three ways:
+  Coverage. A grid survey produces a contamination contour, not a single reading. You can see where the problem is, not just that it exists.
+  Cost per sample. Once built, each additional reading costs reagents and time, not a lab fee and a courier.
+  Context. Every arsenic value is logged with its location and supporting water-quality measurements.
+
+  What it achieves
+  Direct output: a geotagged arsenic contour map of a water body, with pH, conductivity, turbidity and temperature logged at every point, plus a confidence range on each reading rather than a bare number.
+
+  What that changes: you stop guessing which wells, ponds or stretches of creek to test, and start testing the ones the map says are worth testing. Lab capacity goes to the samples that matter.
+
+  Measures of success we would report:
+  Detection repeatability on a held-out set of known standards
+  Number of sample points per hour of mission time
+  Agreement between robot screening and accredited lab confirmation on the same samples
+  Cost per sample point compared to manual collection
+
+  What we are not claiming. Certified quantification. Onboard ICP-MS. Fully submerged solar operation. Unattended multi-month deployment. Regulatory compliance. The binding constraint on this project is analytical chemistry (arsenic quantification near 10 µg/L in a saline matrix), not robotics.
+
+  Required before any public-health use: controlled lab validation, saltwater testing, sensor calibration, endurance testing, and comparison against an accredited laboratory method.</textarea>
+    <div class="bot-actions">
+      <span class="save-state" id="saveState" aria-live="polite">Not saved yet</span>
+      <div class="action-group">
+        <button class="btn ghost" id="clearBrief" type="button">Clear</button>
+        <button class="btn" id="saveBrief" type="button">Save text</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span>MINIBOT · BATTERY 71% · LAST PATROL 12 MIN AGO</span>
+    <span>NEXT PATROL IN 48 MIN</span>
+  </footer>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
